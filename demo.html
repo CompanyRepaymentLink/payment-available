@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Payment Demo</title>
+
+<style>
+body{
+    font-family: Arial;
+    background:#f1f1f1;
+}
+
+.container{
+    max-width:420px;
+    margin:20px auto;
+    background:white;
+    padding:10px;
+    border-radius:6px;
+}
+
+.top-success{
+    background:#a4ff2f;
+    text-align:center;
+    padding:8px;
+    font-weight:bold;
+}
+
+.section{
+    border:2px dashed #6ec6ff;
+    margin-top:12px;
+}
+
+.section-title{
+    background:#2fa4db;
+    color:white;
+    padding:8px;
+    font-weight:bold;
+}
+
+.row{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:8px;
+    border-bottom:1px solid #ddd;
+}
+
+.value{
+    color:#f39c12;
+}
+
+.copy-btn{
+    background:#3b82f6;
+    color:white;
+    border:none;
+    padding:4px 8px;
+    font-size:12px;
+    border-radius:4px;
+    cursor:pointer;
+}
+
+.warning{
+    padding:10px;
+    font-size:13px;
+    color:#555;
+}
+
+input{
+    width:90%;
+    padding:10px;
+    margin:10px;
+    border:1px solid #ccc;
+    border-radius:4px;
+}
+
+button.main-btn{
+    width:100%;
+    padding:12px;
+    background:#4a74a5;
+    color:white;
+    border:none;
+    font-size:16px;
+    margin-top:10px;
+    border-radius:4px;
+    cursor:pointer;
+}
+
+.footer{
+    text-align:center;
+    margin-top:15px;
+    color:#ccc;
+}
+
+#viewer{
+    display:none;
+}
+
+#successMsg{
+    display:none;
+    text-align:center;
+    margin-top:10px;
+    color:green;
+    font-weight:bold;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<!-- GENERATOR MODE -->
+<div id="generator">
+
+<h3>Generate Payment Request</h3>
+
+<input type="text" id="name" placeholder="Receiver Name">
+<input type="text" id="upi" placeholder="UPI ID">
+<input type="number" id="amount" placeholder="Amount (₹)">
+
+<button class="main-btn" onclick="generateLink()">Generate Link</button>
+
+<div id="result"></div>
+
+</div>
+
+<!-- VIEWER MODE -->
+<div id="viewer">
+
+<div class="section">
+<div class="section-title">information</div>
+
+<div class="row">
+<span>Amount</span>
+<span>
+<span class="value" id="v_amount"></span>
+<button class="copy-btn" onclick="copyText('v_amount')">Copy</button>
+</span>
+</div>
+
+<div class="row">
+<span>Name</span>
+<span>
+<span class="value" id="v_name"></span>
+<button class="copy-btn" onclick="copyText('v_name')">Copy</button>
+</span>
+</div>
+
+<div class="row">
+<span>VPA/UPI</span>
+<span>
+<span class="value" id="v_upi"></span>
+<button class="copy-btn" onclick="copyText('v_upi')">Copy</button>
+</span>
+</div>
+
+</div>
+
+<div class="section">
+<div class="section-title">
+Step 2 : Transfer and don't modify this amount to us
+</div>
+<div class="warning">
+⚠ Please record your reference No. (Ref No.) after payment
+</div>
+</div>
+
+<div class="section">
+<div class="section-title">
+Step 3 : Please enter Ref No. to complete the payment
+</div>
+<div class="warning">
+⚠ Be sure to return this page to fill the UTR numbers after you have completed your payment
+</div>
+
+<input type="text" id="txn_input" placeholder="Enter UTR Number">
+
+</div>
+
+<button class="main-btn" onclick="submitPayment()">Submit UTR</button>
+
+<div id="successMsg">✅ Accepted Successfully</div>
+
+<div class="footer">safe and faithful (Demo Project)</div>
+
+</div>
+
+</div>
+
+<script>
+
+function generateLink(){
+    let name = document.getElementById("name").value.trim();
+    let upi = document.getElementById("upi").value.trim();
+    let amount = document.getElementById("amount").value.trim();
+
+    if(!name || !upi || !amount){
+        alert("Please fill all fields");
+        return;
+    }
+
+    let url = window.location.origin + window.location.pathname +
+    "?name=" + encodeURIComponent(name) +
+    "&upi=" + encodeURIComponent(upi) +
+    "&amount=" + encodeURIComponent(amount);
+
+    document.getElementById("result").innerHTML =
+    "<p style='word-wrap:break-word;font-size:12px;'>" + url + "</p>";
+}
+
+function loadPayment(){
+    const params = new URLSearchParams(window.location.search);
+
+    if(params.has("name")){
+        document.getElementById("generator").style.display="none";
+        document.getElementById("viewer").style.display="block";
+
+        document.getElementById("v_name").innerText=params.get("name");
+        document.getElementById("v_upi").innerText=params.get("upi");
+        document.getElementById("v_amount").innerText=params.get("amount")+" / ₹";
+    }
+}
+
+function copyText(id){
+    let text=document.getElementById(id).innerText;
+    navigator.clipboard.writeText(text);
+    alert("Copied: "+text);
+}
+
+function submitPayment(){
+    let txn=document.getElementById("txn_input").value.trim();
+    if(!txn){
+        alert("Please enter UTR Number");
+        return;
+    }
+    document.getElementById("successMsg").style.display="block";
+}
+
+loadPayment();
+
+</script>
+
+</body>
+</html>
